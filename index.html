@@ -156,18 +156,21 @@
             display: flex;
             flex-direction: column;
         }
+
         .card-img-box {
             width: 100%;
-            height: 320px; 
+            /* height: 320px;  <-- INI YANG BIKIN KEPOTONG, KITA HAPUS */
+            height: auto;      /* Biarkan tinggi menyesuaikan */
+            aspect-ratio: 1 / 1; /* Kunci rasio jadi kotak sempurna (1:1) */
             position: relative;
             background: #eee;
+            border-bottom: 3px solid var(--sbs-black); /* Opsional: tambah garis pembatas bawah foto */
         }
+        
         .card-img-box img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .best-rec { 
-            border-color: var(--sbs-orange); 
-            box-shadow: 10px 10px 0px var(--sbs-orange); 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; /* Karena wadahnya sudah kotak, cover aman digunakan */
         }
 
         /* --- STYLE KHUSUS ALCS --- */
