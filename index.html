@@ -26,7 +26,7 @@
 
         .top-bar {
             display: flex; align-items: center; justify-content: flex-start;
-            margin-bottom: 20px; gap: 15px;
+            margin-bottom: 15px; gap: 15px; /* Margin bottom dikurangi sedikit untuk search bar */
         }
         .logo-container {
             width: 70px; height: 70px; background: var(--sbs-black);
@@ -42,17 +42,74 @@
             letter-spacing: -1px; transform: skew(-5deg); text-shadow: 4px 4px 0px #fff;
         }
 
+        /* --- SEARCH BAR STYLE --- */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+            z-index: 101;
+        }
+        .search-box {
+            width: 100%;
+            box-sizing: border-box;
+            background: #fff;
+            border: 3px solid var(--sbs-black);
+            border-radius: 50px;
+            padding: 12px 20px 12px 45px; /* Padding kiri buat icon */
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            outline: none;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+        .search-box:focus {
+            box-shadow: 4px 4px 0px var(--sbs-black);
+            transform: translate(-2px, -2px);
+        }
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .clear-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ddd;
+            border: none;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            display: none; /* Hidden by default */
+            align-items: center; justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #555;
+        }
+
         /* Tabs Style */
         .tabs {
             display: flex; overflow-x: auto; gap: 10px; 
             padding: 12px; 
             margin-bottom: 25px; scrollbar-width: none; 
-            position: sticky; top: 20px; z-index: 100;
+            position: sticky; top: 10px; z-index: 100;
             background: var(--sbs-dark-yellow); 
             border: 3px solid var(--sbs-black); 
             border-radius: 50px; 
             box-shadow: 6px 6px 0px rgba(0,0,0,0.1); 
+            transition: 0.3s;
         }
+        /* Saat mode search, tabs disembunyikan agar user fokus ke hasil */
+        .tabs.hidden-by-search {
+            display: none;
+        }
+        
         .tabs::-webkit-scrollbar { display: none; }
         
         .tab-btn {
@@ -74,14 +131,34 @@
             touch-action: pan-y;
         }
 
-        /* Grid Layout untuk Card Besar */
+        /* Content Logic Update for Search */
         .content { 
             display: none; 
-            animation: fadeIn 0.4s ease-out;
             grid-template-columns: 1fr; 
             gap: 30px;
         }
-        .content.active { display: grid; }
+        
+        .content.active { 
+            display: grid; 
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* Saat searching, kita override display:none agar semua section bisa diperiksa,
+           tapi nanti item di dalamnya yang kita hide/show */
+        .search-mode-active .content {
+            display: grid !important;
+            animation: none;
+        }
+        
+        /* Helper class untuk menyembunyikan kartu yang tidak match */
+        .card-hidden {
+            display: none !important;
+        }
+
+        /* Helper untuk menyembunyikan section kosong saat search */
+        .section-hidden {
+            display: none !important;
+        }
 
         /* --- NEW CARD STYLE (PHOTO ONLY - CLEAN) --- */
         .menu-card {
@@ -95,7 +172,6 @@
             flex-direction: column;
         }
 
-        /* Container Foto Besar */
         .card-img-box {
             width: 100%;
             height: 320px; 
@@ -106,15 +182,12 @@
             width: 100%; height: 100%; object-fit: cover;
         }
         
-        /* Style untuk Price Sticker telah dihapus */
-
-        /* Best Recommendation Highlight (Hanya border dan shadow orange) */
         .best-rec { 
             border-color: var(--sbs-orange); 
             box-shadow: 10px 10px 0px var(--sbs-orange); 
         }
 
-        /* --- STYLE KHUSUS ALCS (Tetap Dipertahankan) --- */
+        /* --- STYLE KHUSUS ALCS --- */
         .alcs-card {
             background: #fff;
             border: 3px solid var(--sbs-black);
@@ -147,6 +220,16 @@
         .alcs-variant { font-weight: 500; color: #333; }
         .alcs-price-tag { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 18px; }
 
+        /* Pesan jika tidak ada hasil */
+        #no-results {
+            display: none;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            margin-top: 50px;
+            opacity: 0.5;
+        }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -160,7 +243,16 @@
     </div>
 </div>
 
-<div class="tabs">
+<div class="search-wrapper">
+    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <input type="text" id="menuSearch" class="search-box" placeholder="Cari menu (e.g. Kopi)..." autocomplete="off">
+    <button id="clearSearch" class="clear-btn" onclick="clearSearchInput()">✕</button>
+</div>
+
+<div class="tabs" id="menuTabs">
     <button class="tab-btn active" onclick="openT(event, 'makan')">Makan Berat</button>
     <button class="tab-btn" onclick="openT(event, 'cemil')">Cemal-Cemil</button>
     <button class="tab-btn" onclick="openT(event, 'black')">Black</button>
@@ -171,6 +263,8 @@
 </div>
 
 <div id="swipe-area">
+    <div id="no-results">MENU TIDAK DITEMUKAN</div>
+
     <div id="makan" class="content active">
         <div class="menu-card">
             <div class="card-img-box">
@@ -371,7 +465,14 @@
 </div>
 
 <script>
+    // --- TAB LOGIC ---
     function openT(e, n) {
+        // Jika sedang search, bersihkan dulu searchnya
+        const searchInput = document.getElementById('menuSearch');
+        if(searchInput.value !== '') {
+            clearSearchInput();
+        }
+
         var i, c, t;
         c = document.getElementsByClassName("content");
         for (i = 0; i < c.length; i++) c[i].classList.remove("active");
@@ -393,16 +494,20 @@
         }
     }
 
+    // --- SWIPE LOGIC ---
     const swipeArea = document.getElementById('swipe-area');
     let startX = 0;
     let endX = 0;
     const minSwipeDistance = 50;
 
     swipeArea.addEventListener('touchstart', (e) => {
+        // Disable swipe jika sedang searching agar tidak membingungkan
+        if(document.body.classList.contains('search-mode-active')) return;
         startX = e.changedTouches[0].screenX;
     }, {passive: true});
 
     swipeArea.addEventListener('touchend', (e) => {
+        if(document.body.classList.contains('search-mode-active')) return;
         endX = e.changedTouches[0].screenX;
         handleSwipeGesture();
     }, {passive: true});
@@ -420,6 +525,139 @@
         } else {
             if (currentIndex > 0) tabs[currentIndex - 1].click();
         }
+    }
+
+    // --- SEARCH LOGIC (HYBRID SEARCH) ---
+    const searchInput = document.getElementById('menuSearch');
+    const clearBtn = document.getElementById('clearSearch');
+    const menuTabs = document.getElementById('menuTabs');
+    const noResults = document.getElementById('no-results');
+
+    // Kategori Spesial (Keywords yang memanggil 1 tab penuh atau lebih)
+    const categoryMap = {
+        'kopi': ['black', 'white'],
+        'coffee': ['black', 'white'],
+        'tea': ['refresh'],
+        'teh': ['refresh'],
+        'makan': ['makan'],
+        'berat': ['makan'],
+        'cemil': ['cemil'],
+        'snack': ['cemil'],
+        'susu': ['comfy'],
+        'milk': ['comfy'],
+        'beer': ['alcs'],
+        'bir': ['alcs'],
+        'alkohol': ['alcs']
+    };
+
+    searchInput.addEventListener('keyup', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        
+        // Show/Hide Clear Button
+        clearBtn.style.display = term.length > 0 ? 'flex' : 'none';
+
+        if (term.length === 0) {
+            exitSearchMode();
+            return;
+        }
+
+        enterSearchMode();
+
+        // 1. Cek apakah term adalah "Category Keyword" (Full Tab Search)
+        if (categoryMap[term]) {
+            showFullCategories(categoryMap[term]);
+        } else {
+            // 2. Jika bukan kategori, cari spesifik item (Alt Text & Content)
+            filterSpecificItems(term);
+        }
+    });
+
+    function enterSearchMode() {
+        document.body.classList.add('search-mode-active');
+        // Sembunyikan tabs agar user fokus ke hasil
+        menuTabs.classList.add('hidden-by-search');
+    }
+
+    function exitSearchMode() {
+        document.body.classList.remove('search-mode-active');
+        menuTabs.classList.remove('hidden-by-search');
+        
+        // Reset semua display hack
+        document.querySelectorAll('.menu-card, .alcs-card').forEach(card => card.classList.remove('card-hidden'));
+        document.querySelectorAll('.content').forEach(section => section.classList.remove('section-hidden'));
+        noResults.style.display = 'none';
+
+        // Kembalikan ke tab terakhir yang aktif (default visual behavior)
+        const activeBtn = document.querySelector('.tab-btn.active');
+        if(activeBtn) {
+            const tabName = activeBtn.getAttribute('onclick').match(/'([^']+)'/)[1];
+            // Memastikan tab view benar
+            var c = document.getElementsByClassName("content");
+            for (var i = 0; i < c.length; i++) c[i].classList.remove("active");
+            document.getElementById(tabName).classList.add("active");
+        }
+    }
+
+    function clearSearchInput() {
+        searchInput.value = '';
+        clearBtn.style.display = 'none';
+        exitSearchMode();
+    }
+
+    // Fungsi: Tampilkan semua item dalam tab tertentu (e.g. Kopi -> Black + White)
+    function showFullCategories(targetIds) {
+        let hasResult = false;
+        
+        // Loop semua section
+        document.querySelectorAll('.content').forEach(section => {
+            const sectionId = section.id;
+            const cards = section.querySelectorAll('.menu-card, .alcs-card');
+
+            if (targetIds.includes(sectionId)) {
+                // Ini section yang dicari (misal Black), tampilkan section & semua kartunya
+                section.classList.remove('section-hidden');
+                cards.forEach(card => card.classList.remove('card-hidden'));
+                hasResult = true;
+            } else {
+                // Ini section yang tidak dicari, sembunyikan section
+                section.classList.add('section-hidden');
+            }
+        });
+        
+        noResults.style.display = hasResult ? 'none' : 'block';
+    }
+
+    // Fungsi: Filter per item berdasarkan teks
+    function filterSpecificItems(term) {
+        let hasResult = false;
+
+        document.querySelectorAll('.content').forEach(section => {
+            let visibleCardsCount = 0;
+            const cards = section.querySelectorAll('.menu-card, .alcs-card');
+
+            cards.forEach(card => {
+                // Cari text di dalam kartu (untuk alcs) atau alt gambar (untuk menu lain)
+                const textContent = card.innerText.toLowerCase();
+                const imgAlt = card.querySelector('img') ? card.querySelector('img').alt.toLowerCase() : '';
+                
+                if (textContent.includes(term) || imgAlt.includes(term)) {
+                    card.classList.remove('card-hidden');
+                    visibleCardsCount++;
+                    hasResult = true;
+                } else {
+                    card.classList.add('card-hidden');
+                }
+            });
+
+            // Jika section tidak punya kartu yang cocok, sembunyikan sectionnya agar rapi
+            if (visibleCardsCount > 0) {
+                section.classList.remove('section-hidden');
+            } else {
+                section.classList.add('section-hidden');
+            }
+        });
+
+        noResults.style.display = hasResult ? 'none' : 'block';
     }
 </script>
 </body>
