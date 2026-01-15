@@ -442,7 +442,7 @@
 <script>
     function openT(e, n) {
         const searchInput = document.getElementById('menuSearch');
-        if(searchInput.value !== '') {
+        if(searchInput && searchInput.value !== '') {
             clearSearchInput();
         }
 
@@ -453,6 +453,8 @@
         for (i = 0; i < t.length; i++) t[i].classList.remove("active");
         
         document.getElementById(n).classList.add("active");
+        
+        // Logic handling tombol aktif
         if(e && e.currentTarget) {
             e.currentTarget.classList.add("active");
             e.currentTarget.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
@@ -467,44 +469,61 @@
         }
     }
 
+    // --- SWIPE LOGIC UPDATE (ANTI SENSITIF) ---
     const swipeArea = document.getElementById('swipe-area');
     let startX = 0;
+    let startY = 0; // Tambahan: Deteksi posisi Y awal
     let endX = 0;
-    const minSwipeDistance = 50;
+    let endY = 0;   // Tambahan: Deteksi posisi Y akhir
+    
+    // Saya naikkan sedikit threshold-nya dari 50 ke 70 pixel biar gak gampang kepencet
+    const minSwipeDistance = 70; 
 
     swipeArea.addEventListener('touchstart', (e) => {
         if(document.body.classList.contains('search-mode-active')) return;
         startX = e.changedTouches[0].screenX;
+        startY = e.changedTouches[0].screenY; // Rekam Y saat mulai sentuh
     }, {passive: true});
 
     swipeArea.addEventListener('touchend', (e) => {
         if(document.body.classList.contains('search-mode-active')) return;
         endX = e.changedTouches[0].screenX;
+        endY = e.changedTouches[0].screenY; // Rekam Y saat lepas sentuh
         handleSwipeGesture();
     }, {passive: true});
 
     function handleSwipeGesture() {
-        const distance = endX - startX;
-        if (Math.abs(distance) < minSwipeDistance) return;
+        const distanceX = endX - startX;
+        const distanceY = endY - startY;
+        
+        // Logika Baru:
+        // 1. Jarak geser samping harus lebih dari minSwipeDistance (70px)
+        // 2. Jarak geser samping (absX) harus LEBIH BESAR dari geser atas-bawah (absY)
+        // Ini mencegah scroll diagonal dianggap swipe.
+        
+        if (Math.abs(distanceX) > minSwipeDistance && Math.abs(distanceX) > Math.abs(distanceY)) {
+            
+            const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+            const activeTab = document.querySelector('.tab-btn.active');
+            const currentIndex = tabs.indexOf(activeTab);
 
-        const tabs = Array.from(document.querySelectorAll('.tab-btn'));
-        const activeTab = document.querySelector('.tab-btn.active');
-        const currentIndex = tabs.indexOf(activeTab);
-
-        if (distance < 0) {
-            if (currentIndex < tabs.length - 1) tabs[currentIndex + 1].click();
-        } else {
-            if (currentIndex > 0) tabs[currentIndex - 1].click();
+            if (distanceX < 0) {
+                // Swipe Kiri (Next Tab)
+                if (currentIndex < tabs.length - 1) tabs[currentIndex + 1].click();
+            } else {
+                // Swipe Kanan (Prev Tab)
+                if (currentIndex > 0) tabs[currentIndex - 1].click();
+            }
         }
+        // Jika geser atas-bawahnya lebih dominan, maka fungsi ini diam saja (biarkan native scroll bekerja)
     }
 
-    // --- SEARCH LOGIC (SMART TAGS) ---
+    // --- SEARCH LOGIC (TETAP SAMA) ---
     const searchInput = document.getElementById('menuSearch');
     const clearBtn = document.getElementById('clearSearch');
     const menuTabs = document.getElementById('menuTabs');
     const noResults = document.getElementById('no-results');
 
-    // Kategori Spesial
     const categoryMap = {
         'kopi': ['black', 'white'],
         'coffee': ['black', 'white'],
@@ -512,23 +531,25 @@
         'beer': ['alcs']
     };
 
-    searchInput.addEventListener('keyup', (e) => {
-        const term = e.target.value.toLowerCase().trim();
-        clearBtn.style.display = term.length > 0 ? 'flex' : 'none';
+    if(searchInput) {
+        searchInput.addEventListener('keyup', (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            clearBtn.style.display = term.length > 0 ? 'flex' : 'none';
 
-        if (term.length === 0) {
-            exitSearchMode();
-            return;
-        }
+            if (term.length === 0) {
+                exitSearchMode();
+                return;
+            }
 
-        enterSearchMode();
+            enterSearchMode();
 
-        if (categoryMap[term]) {
-            showFullCategories(categoryMap[term]);
-        } else {
-            filterSpecificItems(term);
-        }
-    });
+            if (categoryMap[term]) {
+                showFullCategories(categoryMap[term]);
+            } else {
+                filterSpecificItems(term);
+            }
+        });
+    }
 
     function enterSearchMode() {
         document.body.classList.add('search-mode-active');
@@ -553,8 +574,8 @@
     }
 
     function clearSearchInput() {
-        searchInput.value = '';
-        clearBtn.style.display = 'none';
+        if(searchInput) searchInput.value = '';
+        if(clearBtn) clearBtn.style.display = 'none';
         exitSearchMode();
     }
 
@@ -574,16 +595,13 @@
 
     function filterSpecificItems(term) {
         let hasResult = false;
-
         document.querySelectorAll('.content').forEach(section => {
             let visibleCardsCount = 0;
             const cards = section.querySelectorAll('.menu-card, .alcs-card');
-
             cards.forEach(card => {
                 const textContent = card.innerText.toLowerCase(); 
                 const imgAlt = card.querySelector('img') ? card.querySelector('img').alt.toLowerCase() : '';
                 const tags = card.getAttribute('data-tags') ? card.getAttribute('data-tags').toLowerCase() : ''; 
-
                 if (textContent.includes(term) || imgAlt.includes(term) || tags.includes(term)) {
                     card.classList.remove('card-hidden');
                     visibleCardsCount++;
@@ -592,16 +610,15 @@
                     card.classList.add('card-hidden');
                 }
             });
-
             if (visibleCardsCount > 0) {
                 section.classList.remove('section-hidden');
             } else {
                 section.classList.add('section-hidden');
             }
         });
-
         noResults.style.display = hasResult ? 'none' : 'block';
     }
 </script>
+
 </body>
 </html>
