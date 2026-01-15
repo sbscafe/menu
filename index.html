@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBS Authentic Menu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@900&family=Poppins:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sbs-yellow: #FFD200;
+            --sbs-black: #1A1A1A;
+            --sbs-orange: #FF6600;
+            --sbs-dark-yellow: #FFB800;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0; padding: 15px; color: var(--sbs-black);
+            background: 
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 4px),
+                radial-gradient(circle at center, var(--sbs-yellow) 0%, #e6bc00 100%);
+            background-attachment: fixed;
+            overscroll-behavior-y: contain; 
+            padding-bottom: 80px;
+        }
+
+        .top-bar {
+            display: flex; align-items: center; justify-content: flex-start;
+            margin-bottom: 20px; gap: 15px;
+        }
+        .logo-container {
+            width: 70px; height: 70px; background: var(--sbs-black);
+            border-radius: 50%; border: 3px solid #fff; box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            flex-shrink: 0;
+        }
+        .logo-container img { width: 85%; height: auto; }
+        
+        .header-title { flex: 1; display: flex; align-items: center; }
+        .header-title h1 {
+            font-family: 'Bebas Neue', cursive; font-size: 55px; margin: 0; line-height: 0.8;
+            letter-spacing: -1px; transform: skew(-5deg); text-shadow: 4px 4px 0px #fff;
+        }
+
+        /* Tabs Style */
+        .tabs {
+            display: flex; overflow-x: auto; gap: 10px; 
+            padding: 12px; 
+            margin-bottom: 25px; scrollbar-width: none; 
+            position: sticky; top: 20px; z-index: 100;
+            background: var(--sbs-dark-yellow); 
+            border: 3px solid var(--sbs-black); 
+            border-radius: 50px; 
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.1); 
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        
+        .tab-btn {
+            background: #fff; 
+            border: 2px solid var(--sbs-black); 
+            padding: 8px 20px;
+            border-radius: 50px; font-family: 'Montserrat', sans-serif; font-size: 11px;
+            text-transform: uppercase; white-space: nowrap; cursor: pointer;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.2); 
+            transition: 0.1s;
+        }
+        .tab-btn.active {
+            background: var(--sbs-black); color: #fff; transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--sbs-black);
+        }
+
+        #swipe-area {
+            min-height: 60vh;
+            touch-action: pan-y;
+        }
+
+        /* Grid Layout untuk Card Besar */
+        .content { 
+            display: none; 
+            animation: fadeIn 0.4s ease-out;
+            /* Grid satu kolom agar foto besar maksimal di HP */
+            grid-template-columns: 1fr; 
+            gap: 30px;
+        }
+        .content.active { display: grid; }
+
+        /* --- NEW CARD STYLE (BIG PHOTO) --- */
+        .menu-card {
+            background: #fff;
+            border: 3px solid var(--sbs-black);
+            border-radius: 25px; /* Rounded besar */
+            overflow: hidden;
+            box-shadow: 10px 10px 0px var(--sbs-black); /* Shadow tebal */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Container Foto Besar */
+        .card-img-box {
+            width: 100%;
+            height: 280px; /* Tinggi foto fixed agar seragam & besar */
+            position: relative;
+            border-bottom: 3px solid var(--sbs-black);
+            background: #eee;
+        }
+        .card-img-box img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        /* Sticker Harga Mengambang */
+        .price-sticker {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: var(--sbs-yellow);
+            color: var(--sbs-black);
+            font-family: 'Bebas Neue', cursive;
+            font-size: 32px;
+            padding: 2px 15px 0px 15px;
+            border: 2px solid var(--sbs-black);
+            box-shadow: 4px 4px 0px var(--sbs-black);
+            transform: rotate(-3deg); /* Miring sedikit biar stylish */
+            z-index: 10;
+        }
+
+        /* Area Teks di Bawah Foto */
+        .card-info {
+            padding: 15px 20px;
+            position: relative;
+        }
+        
+        .item-name { 
+            font-family: 'Montserrat', sans-serif; 
+            font-size: 24px; /* Judul lebih besar */
+            text-transform: uppercase; 
+            margin: 0; 
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+        
+        .item-desc { 
+            font-size: 13px; 
+            color: #555; 
+            font-style: italic; 
+            display: block; 
+            font-weight: 500;
+        }
+
+        /* Best Recommendation Highlight */
+        .best-rec { 
+            border-color: var(--sbs-orange); 
+            box-shadow: 10px 10px 0px var(--sbs-orange); 
+        }
+        .best-rec .card-img-box { border-bottom-color: var(--sbs-orange); }
+        .best-rec .item-name { color: var(--sbs-orange); }
+        .best-rec .price-sticker { 
+            background: var(--sbs-orange); 
+            color: #fff; 
+            border-color: var(--sbs-black); 
+        }
+
+        /* --- STYLE KHUSUS ALCS (Tetap List) --- */
+        .alcs-card {
+            background: #fff;
+            border: 3px solid var(--sbs-black);
+            box-shadow: 8px 8px 0px var(--sbs-black);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 0; /* Margin dihandle oleh Grid gap */
+            position: relative;
+        }
+        .alcs-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 26px;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #eee;
+            padding-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .alcs-list {
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .alcs-row {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 16px;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 5px;
+        }
+        .alcs-row:last-child { border-bottom: none; }
+        .alcs-variant { font-weight: 500; color: #333; }
+        .alcs-price-tag { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 18px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="logo-container">
+        <img src="https://via.placeholder.com/100x100?text=SBS" alt="SBS Logo">
+    </div>
+    <div class="header-title">
+        <h1>OUR MENU</h1>
+    </div>
+</div>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="openT(event, 'makan')">Makan Berat</button>
+    <button class="tab-btn" onclick="openT(event, 'cemil')">Cemal-Cemil</button>
+    <button class="tab-btn" onclick="openT(event, 'black')">Black</button>
+    <button class="tab-btn" onclick="openT(event, 'white')">White</button>
+    <button class="tab-btn" onclick="openT(event, 'comfy')">Comfy</button>
+    <button class="tab-btn" onclick="openT(event, 'refresh')">Refreshing</button>
+    <button class="tab-btn" onclick="openT(event, 'alcs')">Alcs</button>
+</div>
+
+<div id="swipe-area">
+    <div id="makan" class="content active">
+        <div class="menu-card">
+            <div class="card-img-box">
+                <img src="https://via.placeholder.com/400x300?text=Kalter" alt="Kalter">
+                <div class="price-sticker">20K</div>
+            </div>
+            <div class="card-info"><h3 class="item-name">Kalter</h3><span class="item-desc">[Nasi Tahu Telor]</span></div>
+        </div>
+
+        <div class="menu-card">
+            <div class="card-img-box">
+                <img src="https://via.placeholder.com/400x300?text=Obama" alt="Obama">
+                <div class="price-sticker">25K</div>
+            </div>
+            <div class="card-info"><h3 class="item-name">Obama</h3><span class="item-desc">[Nasi Ayam Geprek Sambal Matah]</span></div>
+        </div>
+
+        <div class="menu-card best-rec">
+            <div class="card-img-box">
+                <img src="https://via.placeholder.com/400x300?text=Mangku+Koe" alt="Mangku Koe">
+                <div class="price-sticker">28K</div>
+            </div>
+            <div class="card-info"><h3 class="item-name">Mangku Koe</h3><span class="item-desc">[Nasi Chicken Katsu Kari]</span></div>
+        </div>
+
+        <div class="menu-card best-rec">
+            <div class="card-img-box">
+                <img src="https://via.placeholder.com/400x300?text=Mangku+Ayang" alt="Mangku Ayang">
+                <div class="price-sticker">25K</div>
+            </div>
+            <div class="card-info"><h3 class="item-name">Mangku Ayang</h3><span class="item-desc">[Nasi Ayam Siram]</span></div>
+        </div>
+
+        <div class="menu-card best-rec">
+            <div class="card-img-box">
+                <img src="https://via.placeholder.com/400x300?text=Barudak" alt="Barudak">
+                <div class="price-sticker">20K</div>
+            </div>
+            <div class="card-info"><h3 class="item-name">Barudak</h3><span class="item-desc">[Bakmie Katsu Sambal Matah]</span></div>
+        </div>
+
+        <div class="menu-card">
+            <div class="card-img-box">
+                <img src="https://via.placeholder.com/400x300?text=Sekena+Gomes" alt="Sekena Gomes">
+                <div class="price-sticker">22K</div>
+            </div>
+            <div class="card-info"><h3 class="item-name">Sekena Gomes</h3><span class="item-desc">[Nasgor Merah + Katsu + Sambal Matah]</span></div>
+        </div>
+
+        <div class="menu-card">
+            <div class="card-img-box">
+                <img src="https://via.placeholder.com/400x300?text=Sekena+Goput" alt="Sekena Goput">
+                <div class="price-sticker">22K</div>
+            </div>
+            <div class="card-info"><h3 class="item-name">Sekena Goput</h3><span class="item-desc">[Nasgor Putih + Katsu + Sambal Matah]</span></div>
+        </div>
+
+        <div class="menu-card best-rec">
+            <div class="card-img-box">
+                <img src="https://via.placeholder.com/400x300?text=Sekena+Keren" alt="Sekena Keren">
+                <div class="price-sticker">25K</div>
+            </div>
+            <div class="card-info"><h3 class="item-name">Sekena Keren</h3><span class="item-desc">[Nasgor Kari + Katsu + Sambal Matah]</span></div>
+        </div>
+    </div>
+
+    <div id="cemil" class="content">
+        <div class="menu-card best-rec">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Paket+Sambat" alt="Paket Sambat"><div class="price-sticker">35K</div></div>
+            <div class="card-info"><h3 class="item-name">Paket Sambat</h3><span class="item-desc">[Aneka Camilan]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Cricket" alt="Cricket"><div class="price-sticker">25K</div></div>
+            <div class="card-info"><h3 class="item-name">Cricket</h3><span class="item-desc">[Chicken Fillet Lava]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Potato+Freak" alt="Potato Freak"><div class="price-sticker">17K</div></div>
+            <div class="card-info"><h3 class="item-name">Potato Freak</h3><span class="item-desc">[French Fries]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Uhat+Lawik" alt="Uhat Lawik"><div class="price-sticker">17K</div></div>
+            <div class="card-info"><h3 class="item-name">Uhat Lawik</h3><span class="item-desc">[Tahu Walik]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Gyozable" alt="Gyozable"><div class="price-sticker">18K</div></div>
+            <div class="card-info"><h3 class="item-name">Gyozable</h3><span class="item-desc">[Gyoza]</span></div>
+        </div>
+        <div class="menu-card best-rec">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Tahu+Julit" alt="Tahu Julit"><div class="price-sticker">19K</div></div>
+            <div class="card-info"><h3 class="item-name">Tahu Julit</h3><span class="item-desc">[Tahu Cabe Garam]</span></div>
+        </div>
+    </div>
+
+    <div id="black" class="content">
+        <div class="menu-card best-rec">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Fressa" alt="Fressa"><div class="price-sticker">25K</div></div>
+            <div class="card-info"><h3 class="item-name">Fressa</h3><span class="item-desc">[Berry Soda Coffee]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Americano" alt="Americano"><div class="price-sticker">16K</div></div>
+            <div class="card-info"><h3 class="item-name">Americano</h3><span class="item-desc">[Americano]</span></div>
+        </div>
+        <div class="menu-card best-rec">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Dark+Freshly" alt="Dark Freshly"><div class="price-sticker">19K</div></div>
+            <div class="card-info"><h3 class="item-name">Dark Freshly</h3><span class="item-desc">[Americano Lemon]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Darkberry" alt="Darkberry"><div class="price-sticker">19K</div></div>
+            <div class="card-info"><h3 class="item-name">Darkberry</h3><span class="item-desc">[Americano Berry]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Tubruk+Syari" alt="Tubruk Syari"><div class="price-sticker">13K</div></div>
+            <div class="card-info"><h3 class="item-name">Tubruk Syari</h3><span class="item-desc">[Kopi Tubruk]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Hanoi+Tears" alt="Hanoi Tears"><div class="price-sticker">15K</div></div>
+            <div class="card-info"><h3 class="item-name">Hanoi Tears</h3><span class="item-desc">[Vietnam Drip]</span></div>
+        </div>
+    </div>
+
+    <div id="white" class="content">
+        <div class="menu-card best-rec">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Penkopi" alt="Penkopi"><div class="price-sticker">23K</div></div>
+            <div class="card-info"><h3 class="item-name">Penkopi</h3><span class="item-desc">[Creamy Coffee]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Macch+Favorito" alt="Macch Favorito"><div class="price-sticker">20K</div></div>
+            <div class="card-info"><h3 class="item-name">Macch Favorito</h3><span class="item-desc">[Caramel Macchiato]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Specta" alt="Specta"><div class="price-sticker">25K</div></div>
+            <div class="card-info"><h3 class="item-name">Specta</h3><span class="item-desc">[Peanut Coffee]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Comica" alt="Comica"><div class="price-sticker">22K</div></div>
+            <div class="card-info"><h3 class="item-name">Comica</h3><span class="item-desc">[Hazelnut Coffee]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Rhumpee" alt="Rhumpee"><div class="price-sticker">20K</div></div>
+            <div class="card-info"><h3 class="item-name">Rhumpee</h3><span class="item-desc">[Rhum Coffee]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Crush" alt="Crush"><div class="price-sticker">22K</div></div>
+            <div class="card-info"><h3 class="item-name">Crush</h3><span class="item-desc">[Rhum Regal Coffee]</span></div>
+        </div>
+    </div>
+
+    <div id="comfy" class="content">
+        <div class="menu-card best-rec">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Mammy" alt="Mammy"><div class="price-sticker">18K</div></div>
+            <div class="card-info"><h3 class="item-name">Mammy</h3><span class="item-desc">[Matcha Latte]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Deep+Choc" alt="Deep Choc"><div class="price-sticker">18K</div></div>
+            <div class="card-info"><h3 class="item-name">Deep Choc</h3><span class="item-desc">[Chocolate]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Schopea" alt="Schopea"><div class="price-sticker">25K</div></div>
+            <div class="card-info"><h3 class="item-name">Schopea</h3><span class="item-desc">[Peanut Chocolate]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Creamberry" alt="Creamberry"><div class="price-sticker">23K</div></div>
+            <div class="card-info"><h3 class="item-name">Creamberry</h3><span class="item-desc">[Berry Latte]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Jandu" alt="Jandu"><div class="price-sticker">18K</div></div>
+            <div class="card-info"><h3 class="item-name">Jandu</h3><span class="item-desc">[Jahe Madu]</span></div>
+        </div>
+    </div>
+
+    <div id="refresh" class="content">
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Threepi" alt="Threepi"><div class="price-sticker">15K</div></div>
+            <div class="card-info"><h3 class="item-name">Threepi</h3><span class="item-desc">[Tropical Tea]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Teh+Gelies" alt="Teh Gelies"><div class="price-sticker">10K</div></div>
+            <div class="card-info"><h3 class="item-name">Teh Gelies</h3><span class="item-desc">[Jasmine Tea]</span></div>
+        </div>
+        <div class="menu-card best-rec">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Red+Bloom" alt="Red Bloom"><div class="price-sticker">18K</div></div>
+            <div class="card-info"><h3 class="item-name">Red Bloom</h3><span class="item-desc">[Yakult Berry]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Yagustea" alt="Yagustea"><div class="price-sticker">15K</div></div>
+            <div class="card-info"><h3 class="item-name">Yagustea</h3><span class="item-desc">[Yakult Sugus Grape]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Chenteal" alt="Chenteal"><div class="price-sticker">15K</div></div>
+            <div class="card-info"><h3 class="item-name">Chenteal</h3><span class="item-desc">[Yakult Lychee Tea]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Trustey" alt="Trustey"><div class="price-sticker">18K</div></div>
+            <div class="card-info"><h3 class="item-name">Trustey</h3><span class="item-desc">[Honey Yuzu]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Rindu" alt="Rindu"><div class="price-sticker">15K</div></div>
+            <div class="card-info"><h3 class="item-name">Rindu</h3><span class="item-desc">[Winter Melon]</span></div>
+        </div>
+        <div class="menu-card">
+            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Literally+Water" alt="Literally Water"><div class="price-sticker">5K</div></div>
+            <div class="card-info"><h3 class="item-name">Literally Water</h3><span class="item-desc">[Air Mineral Cleo]</span></div>
+        </div>
+    </div>
+
+    <div id="alcs" class="content">
+        <div class="alcs-card">
+            <div class="alcs-brand">BINTANG</div>
+            <div class="alcs-list">
+                <div class="alcs-row"><span class="alcs-variant">Small</span><span class="alcs-price-tag">32K</span></div>
+                <div class="alcs-row"><span class="alcs-variant">Radler</span><span class="alcs-price-tag">32K</span></div>
+                <div class="alcs-row"><span class="alcs-variant">Large</span><span class="alcs-price-tag">50K</span></div>
+            </div>
+        </div>
+        <div class="alcs-card">
+            <div class="alcs-brand">ANKER</div>
+            <div class="alcs-list">
+                <div class="alcs-row"><span class="alcs-variant">Lychee</span><span class="alcs-price-tag">29K</span></div>
+                <div class="alcs-row"><span class="alcs-variant">Pineapple</span><span class="alcs-price-tag">29K</span></div>
+            </div>
+        </div>
+        <div class="alcs-card">
+            <div class="alcs-brand">SMIRNOFF</div>
+            <div class="alcs-list">
+                <div class="alcs-row"><span class="alcs-variant">Raspberry</span><span class="alcs-price-tag">33K</span></div>
+                <div class="alcs-row"><span class="alcs-variant">Green Apple</span><span class="alcs-price-tag">33K</span></div>
+                <div class="alcs-row"><span class="alcs-variant">Lemon Lychee</span><span class="alcs-price-tag">33K</span></div>
+                <div class="alcs-row"><span class="alcs-variant">Pink Lemonade</span><span class="alcs-price-tag">33K</span></div>
+            </div>
+        </div>
+        <div class="alcs-card">
+            <div class="alcs-brand">MIX MAX</div>
+            <div class="alcs-list">
+                <div class="alcs-row"><span class="alcs-variant">Anggur Merah</span><span class="alcs-price-tag">34K</span></div>
+                <div class="alcs-row"><span class="alcs-variant">Exotic Blue</span><span class="alcs-price-tag">34K</span></div>
+            </div>
+        </div>
+        <div class="alcs-card">
+            <div class="alcs-brand">ICELAND</div>
+            <div class="alcs-list">
+                <div class="alcs-row"><span class="alcs-variant">Lychee</span><span class="alcs-price-tag">34K</span></div>
+                <div class="alcs-row"><span class="alcs-variant">Long Island</span><span class="alcs-price-tag">34K</span></div>
+            </div>
+        </div>
+        <div class="alcs-card">
+            <div class="alcs-brand">API</div>
+            <div class="alcs-list">
+                <div class="alcs-row"><span class="alcs-variant">Anggur Hijau</span><span class="alcs-price-tag">106K</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openT(e, n) {
+        var i, c, t;
+        c = document.getElementsByClassName("content");
+        for (i = 0; i < c.length; i++) c[i].classList.remove("active");
+        t = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < t.length; i++) t[i].classList.remove("active");
+        
+        document.getElementById(n).classList.add("active");
+        if(e && e.currentTarget) {
+            e.currentTarget.classList.add("active");
+            e.currentTarget.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
+        } else {
+            for (i = 0; i < t.length; i++) {
+                if(t[i].getAttribute('onclick').includes(n)) {
+                    t[i].classList.add("active");
+                    t[i].scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
+                    break;
+                }
+            }
+        }
+    }
+
+    const swipeArea = document.getElementById('swipe-area');
+    let startX = 0;
+    let endX = 0;
+    const minSwipeDistance = 50;
+
+    swipeArea.addEventListener('touchstart', (e) => {
+        startX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    swipeArea.addEventListener('touchend', (e) => {
+        endX = e.changedTouches[0].screenX;
+        handleSwipeGesture();
+    }, {passive: true});
+
+    function handleSwipeGesture() {
+        const distance = endX - startX;
+        if (Math.abs(distance) < minSwipeDistance) return;
+
+        const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+        const activeTab = document.querySelector('.tab-btn.active');
+        const currentIndex = tabs.indexOf(activeTab);
+
+        if (distance < 0) {
+            if (currentIndex < tabs.length - 1) tabs[currentIndex + 1].click();
+        } else {
+            if (currentIndex > 0) tabs[currentIndex - 1].click();
+        }
+    }
+</script>
+</body>
+</html>
