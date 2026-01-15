@@ -34,7 +34,7 @@
             display: flex; align-items: center; justify-content: center; overflow: hidden;
             flex-shrink: 0;
         }
-        .logo-container img { width: 85%; height: auto; }
+        .logo-container img { width: 100%; height: auto; }
         
         .header-title { flex: 1; display: flex; align-items: center; }
         .header-title h1 {
@@ -83,7 +83,7 @@
         }
         .content.active { display: grid; }
 
-        /* --- NEW CARD STYLE (PHOTO ONLY) --- */
+        /* --- NEW CARD STYLE (PHOTO ONLY - CLEAN) --- */
         .menu-card {
             background: #fff;
             border: 3px solid var(--sbs-black);
@@ -98,41 +98,20 @@
         /* Container Foto Besar */
         .card-img-box {
             width: 100%;
-            height: 320px; /* Tinggi sedikit ditambah agar lebih lega */
+            height: 320px; 
             position: relative;
-            /* Border bottom dihapus karena tidak ada teks di bawahnya */
             background: #eee;
         }
         .card-img-box img {
             width: 100%; height: 100%; object-fit: cover;
         }
+        
+        /* Style untuk Price Sticker telah dihapus */
 
-        /* Sticker Harga Mengambang */
-        .price-sticker {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: var(--sbs-yellow);
-            color: var(--sbs-black);
-            font-family: 'Bebas Neue', cursive;
-            font-size: 36px; /* Ukuran font sedikit diperbesar */
-            padding: 4px 18px 2px 18px;
-            border: 3px solid var(--sbs-black);
-            box-shadow: 5px 5px 0px var(--sbs-black);
-            transform: rotate(-3deg); 
-            z-index: 10;
-        }
-
-        /* Best Recommendation Highlight */
+        /* Best Recommendation Highlight (Hanya border dan shadow orange) */
         .best-rec { 
             border-color: var(--sbs-orange); 
             box-shadow: 10px 10px 0px var(--sbs-orange); 
-        }
-        /* Penyesuaian untuk best-rec tanpa border bottom */
-        .best-rec .price-sticker { 
-            background: var(--sbs-orange); 
-            color: #fff; 
-            border-color: var(--sbs-black); 
         }
 
         /* --- STYLE KHUSUS ALCS (Tetap Dipertahankan) --- */
@@ -175,8 +154,7 @@
 
 <div class="top-bar">
     <div class="logo-container">
-        <img src="https://via.placeholder.com/100x100?text=SBS" alt="SBS Logo">
-    </div>
+        <img src="img/sbslogo.jpg" alt="SBS Logo"> </div>
     <div class="header-title">
         <h1>OUR MENU</h1>
     </div>
@@ -196,166 +174,151 @@
     <div id="makan" class="content active">
         <div class="menu-card">
             <div class="card-img-box">
-                <img src="https://via.placeholder.com/400x300?text=Kalter" alt="Kalter">
-                <div class="price-sticker">20K</div>
+                <img src="img/kalter.webp" alt="Kalter">
             </div>
         </div>
-
         <div class="menu-card">
             <div class="card-img-box">
-                <img src="https://via.placeholder.com/400x300?text=Obama" alt="Obama">
-                <div class="price-sticker">25K</div>
+                <img src="img/obama.webp" alt="Obama">
             </div>
         </div>
-
         <div class="menu-card best-rec">
             <div class="card-img-box">
-                <img src="https://via.placeholder.com/400x300?text=Mangku+Koe" alt="Mangku Koe">
-                <div class="price-sticker">28K</div>
+                <img src="img/mangkukoe.webp" alt="Mangku Koe">
             </div>
         </div>
-
         <div class="menu-card best-rec">
             <div class="card-img-box">
-                <img src="https://via.placeholder.com/400x300?text=Mangku+Ayang" alt="Mangku Ayang">
-                <div class="price-sticker">25K</div>
+                <img src="img/mangkuayang.webp" alt="Mangku Ayang">
             </div>
         </div>
-
         <div class="menu-card best-rec">
             <div class="card-img-box">
-                <img src="https://via.placeholder.com/400x300?text=Barudak" alt="Barudak">
-                <div class="price-sticker">20K</div>
+                <img src="img/barudak.webp" alt="Barudak">
             </div>
         </div>
-
         <div class="menu-card">
             <div class="card-img-box">
-                <img src="https://via.placeholder.com/400x300?text=Sekena+Gomes" alt="Sekena Gomes">
-                <div class="price-sticker">22K</div>
+                <img src="img/sekenagomes.webp" alt="Sekena Gomes">
             </div>
         </div>
-
         <div class="menu-card">
             <div class="card-img-box">
-                <img src="https://via.placeholder.com/400x300?text=Sekena+Goput" alt="Sekena Goput">
-                <div class="price-sticker">22K</div>
+                <img src="img/sekenagoput.webp" alt="Sekena Goput">
             </div>
         </div>
-
         <div class="menu-card best-rec">
             <div class="card-img-box">
-                <img src="https://via.placeholder.com/400x300?text=Sekena+Keren" alt="Sekena Keren">
-                <div class="price-sticker">25K</div>
+                <img src="img/sekenakeren.webp" alt="Sekena Keren">
             </div>
         </div>
     </div>
 
     <div id="cemil" class="content">
         <div class="menu-card best-rec">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Paket+Sambat" alt="Paket Sambat"><div class="price-sticker">35K</div></div>
+            <div class="card-img-box"><img src="img/paketsambat.webp" alt="Paket Sambat"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Cricket" alt="Cricket"><div class="price-sticker">25K</div></div>
+            <div class="card-img-box"><img src="img/cricket.webp" alt="Cricket"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Potato+Freak" alt="Potato Freak"><div class="price-sticker">17K</div></div>
+            <div class="card-img-box"><img src="img/potatofreak.webp" alt="Potato Freak"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Uhat+Lawik" alt="Uhat Lawik"><div class="price-sticker">17K</div></div>
+            <div class="card-img-box"><img src="img/uhatlawik.webp" alt="Uhat Lawik"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Gyozable" alt="Gyozable"><div class="price-sticker">18K</div></div>
+            <div class="card-img-box"><img src="img/gyozable.webp" alt="Gyozable"></div>
         </div>
         <div class="menu-card best-rec">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Tahu+Julit" alt="Tahu Julit"><div class="price-sticker">19K</div></div>
+            <div class="card-img-box"><img src="img/tahujulit.webp" alt="Tahu Julit"></div>
         </div>
     </div>
 
     <div id="black" class="content">
         <div class="menu-card best-rec">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Fressa" alt="Fressa"><div class="price-sticker">25K</div></div>
+            <div class="card-img-box"><img src="img/fressa.webp" alt="Fressa"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Americano" alt="Americano"><div class="price-sticker">16K</div></div>
+            <div class="card-img-box"><img src="img/americano.webp" alt="Americano"></div>
         </div>
         <div class="menu-card best-rec">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Dark+Freshly" alt="Dark Freshly"><div class="price-sticker">19K</div></div>
+            <div class="card-img-box"><img src="img/darkfreshly.webp" alt="Dark Freshly"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Darkberry" alt="Darkberry"><div class="price-sticker">19K</div></div>
+            <div class="card-img-box"><img src="img/darkberry.webp" alt="Darkberry"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Tubruk+Syari" alt="Tubruk Syari"><div class="price-sticker">13K</div></div>
+            <div class="card-img-box"><img src="img/tubruksyari.webp" alt="Tubruk Syari"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Hanoi+Tears" alt="Hanoi Tears"><div class="price-sticker">15K</div></div>
+            <div class="card-img-box"><img src="img/hanoitears.webp" alt="Hanoi Tears"></div>
         </div>
     </div>
 
     <div id="white" class="content">
         <div class="menu-card best-rec">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Penkopi" alt="Penkopi"><div class="price-sticker">23K</div></div>
+            <div class="card-img-box"><img src="img/penkopi.webp" alt="Penkopi"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Macch+Favorito" alt="Macch Favorito"><div class="price-sticker">20K</div></div>
+            <div class="card-img-box"><img src="img/macchfavorito.webp" alt="Macch Favorito"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Specta" alt="Specta"><div class="price-sticker">25K</div></div>
+            <div class="card-img-box"><img src="img/specta.webp" alt="Specta"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Comica" alt="Comica"><div class="price-sticker">22K</div></div>
+            <div class="card-img-box"><img src="img/comica.webp" alt="Comica"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Rhumpee" alt="Rhumpee"><div class="price-sticker">20K</div></div>
+            <div class="card-img-box"><img src="img/rhumpee.webp" alt="Rhumpee"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Crush" alt="Crush"><div class="price-sticker">22K</div></div>
+            <div class="card-img-box"><img src="img/crush.webp" alt="Crush"></div>
         </div>
     </div>
 
     <div id="comfy" class="content">
         <div class="menu-card best-rec">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Mammy" alt="Mammy"><div class="price-sticker">18K</div></div>
+            <div class="card-img-box"><img src="img/mammy.webp" alt="Mammy"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Deep+Choc" alt="Deep Choc"><div class="price-sticker">18K</div></div>
+            <div class="card-img-box"><img src="img/deepchoc.webp" alt="Deep Choc"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Schopea" alt="Schopea"><div class="price-sticker">25K</div></div>
+            <div class="card-img-box"><img src="img/schopea.webp" alt="Schopea"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Creamberry" alt="Creamberry"><div class="price-sticker">23K</div></div>
+            <div class="card-img-box"><img src="img/creamberry.webp" alt="Creamberry"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Jandu" alt="Jandu"><div class="price-sticker">18K</div></div>
+            <div class="card-img-box"><img src="img/jandu.webp" alt="Jandu"></div>
         </div>
     </div>
 
     <div id="refresh" class="content">
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Threepi" alt="Threepi"><div class="price-sticker">15K</div></div>
+            <div class="card-img-box"><img src="img/threepi.webp" alt="Threepi"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Teh+Gelies" alt="Teh Gelies"><div class="price-sticker">10K</div></div>
+            <div class="card-img-box"><img src="img/tehgelies.webp" alt="Teh Gelies"></div>
         </div>
         <div class="menu-card best-rec">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Red+Bloom" alt="Red Bloom"><div class="price-sticker">18K</div></div>
+            <div class="card-img-box"><img src="img/redbloom.webp" alt="Red Bloom"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Yagustea" alt="Yagustea"><div class="price-sticker">15K</div></div>
+            <div class="card-img-box"><img src="img/yagustea.webp" alt="Yagustea"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Chenteal" alt="Chenteal"><div class="price-sticker">15K</div></div>
+            <div class="card-img-box"><img src="img/chenteal.webp" alt="Chenteal"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Trustey" alt="Trustey"><div class="price-sticker">18K</div></div>
+            <div class="card-img-box"><img src="img/trustey.webp" alt="Trustey"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Rindu" alt="Rindu"><div class="price-sticker">15K</div></div>
+            <div class="card-img-box"><img src="img/rindu.webp" alt="Rindu"></div>
         </div>
         <div class="menu-card">
-            <div class="card-img-box"><img src="https://via.placeholder.com/400x300?text=Literally+Water" alt="Literally Water"><div class="price-sticker">5K</div></div>
+            <div class="card-img-box"><img src="img/literallywater.webp" alt="Literally Water"></div>
         </div>
     </div>
 
